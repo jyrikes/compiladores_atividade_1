@@ -1,70 +1,43 @@
-%{
-    #include <stdio.h>
+%option noyywrap nodefault noinput nounput
 
-    size_t linhas;
-    size_t palavras;
-    size_t caracteres;
-    size_t inteiros;
-    size_t floats;
-    size_t pontuacoes;
+%{
+#include <stdio.h>
+#include <stddef.h>
+
+static size_t linhas = 0;
+static size_t palavras = 0;
+static size_t caracteres = 0;
+static size_t inteiros = 0;
+static size_t floats = 0;
+static size_t pontuacoes = 0;
 %}
 
-%option noyywrap
-
-LETRA       [a-zA-ZáàâãéêíóôõúçÁÀÂÃÉÊÍÓÔÕÚÇ]
-PALAVRA     {LETRA}+
+LETRA       [a-zA-Z]
 DIGITO      [0-9]
+PALAVRA     {LETRA}+
 INTEIRO     {DIGITO}+
-FLOAT       {INTEIRO}\.{INTEIRO}
+FLOAT       {DIGITO}+\.{DIGITO}+
 PONTUACAO   [.,;:!?]
 
 %%
 
-{FLOAT} {
-    floats++;
-    caracteres += yyleng;
-}
-
-{INTEIRO} {
-    inteiros++;
-    caracteres += yyleng;
-}
-
-{PALAVRA} {
-    palavras++;
-    caracteres += yyleng;
-}
-
-{PONTUACAO} {
-    pontuacoes++;
-    caracteres += yyleng;
-}
-
-\n {
-    linhas++;
-    caracteres += yyleng;
-}
-
-. {
-    caracteres += yyleng;
-}
+{FLOAT}       { floats++; caracteres += yyleng; }
+{INTEIRO}     { inteiros++; caracteres += yyleng; }
+{PALAVRA}     { palavras++; caracteres += yyleng; }
+{PONTUACAO}   { pontuacoes++; caracteres += yyleng; }
+\n            { linhas++; caracteres += yyleng; }
+.             { caracteres += yyleng; }
 
 %%
 
-int main(int argc, char **argv)
+int main(void)
 {
     yylex();
-
-    printf("+--------------------------+\n");
-    printf("| %-12s | %10s |\n", "Metrica", "Valor");
-    printf("+--------------------------+\n");
-    printf("| %-12s | %10zu |\n", "Linhas", linhas);
-    printf("| %-12s | %10zu |\n", "Palavras", palavras);
-    printf("| %-12s | %10zu |\n", "Caracteres", caracteres);
-    printf("| %-12s | %10zu |\n", "Inteiros", inteiros);
-    printf("| %-12s | %10zu |\n", "Floats", floats);
-    printf("| %-12s | %10zu |\n", "Pontuacoes", pontuacoes);
-    printf("+--------------------------+\n");
-
+    printf("linhas: %zu\n", linhas);
+    printf("palavras: %zu\n", palavras);
+    printf("caracteres: %zu\n", caracteres);
+    printf("inteiros: %zu\n", inteiros);
+    printf("floats: %zu\n", floats);
+    printf("pontuacoes: %zu\n", pontuacoes);
     return 0;
 }
